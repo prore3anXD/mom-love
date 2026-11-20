@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Мамо, ти мене любиш?</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    overflow: hidden;
+    position: relative;
+    padding: 20px;
+    text-align: center;
+    /* Ніжний весняний градієнт */
+    background: linear-gradient(-45deg, #fbc2eb, #a6c1ee, #fbc2eb, #ffd1ff, #e0c3fc);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+
+  /* Легке світіння */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.6) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255, 182, 213, 0.5) 0%, transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+    animation: glowPulse 8s ease-in-out infinite;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  /* Плаваючі сердечка/квіти */
+  .heart {
+    position: fixed;
+    animation: floatUp linear infinite;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    filter: drop-shadow(0 2px 6px rgba(166, 193, 238, 0.4));
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+    10% { opacity: 0.85; }
+    90% { opacity: 0.85; }
+    100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; }
+  }
+
+  #questionBlock, #finalMessage {
+    position: relative;
+    z-index: 5;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 7vw, 3rem);
+    color: #6a1b9a;
+    margin-bottom: 40px;
+    text-shadow: 0 2px 20px rgba(255, 255, 255, 0.9), 0 0 30px rgba(224, 195, 252, 0.5);
+    transition: all 0.4s ease;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .buttons {
+    position: relative;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+  }
+
+  button {
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    padding: 15px 45px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.3s ease;
+    font-family: inherit;
+    user-select: none;
+  }
+
+  #yesBtn {
+    background: linear-gradient(135deg, #ce93d8, #8e24aa);
+    color: white;
+    box-shadow: 0 8px 30px rgba(142, 36, 170, 0.45), 0 0 40px rgba(206, 147, 216, 0.3);
+    animation: yesGlow 2.5s ease-in-out infinite;
+  }
+
+  @keyframes yesGlow {
+    0%, 100% { box-shadow: 0 8px 30px rgba(142, 36, 170, 0.45), 0 0 40px rgba(206, 147, 216, 0.3); }
+    50% { box-shadow: 0 8px 40px rgba(142, 36, 170, 0.6), 0 0 60px rgba(206, 147, 216, 0.5); }
+  }
+
+  #yesBtn:active {
+    transform: scale(0.95);
+  }
+
+  #noBtn {
+    background: rgba(255, 255, 255, 0.95);
+    color: #6a1b9a;
+    box-shadow: 0 8px 25px rgba(142, 36, 170, 0.2);
+    position: absolute;
+    transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    left: 0;
+    top: 0;
+    z-index: 10;
+  }
+
+  #finalMessage {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: popIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  #finalMessage h1 {
+    font-size: clamp(1.4rem, 5.5vw, 2.6rem);
+    line-height: 1.5;
+    color: #6a1b9a;
+  }
+
+  #finalMessage .big-heart {
+    font-size: clamp(4rem, 20vw, 8rem);
+    animation: beat 1s infinite;
+    margin-top: 20px;
+    filter: drop-shadow(0 0 30px rgba(206, 147, 216, 0.6));
+  }
+
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.15); }
+    50% { transform: scale(1); }
+    75% { transform: scale(1.1); }
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .confetti {
+    position: fixed;
+    pointer-events: none;
+    animation: fall 3.5s linear forwards;
+    z-index: 100;
+    filter: drop-shadow(0 0 8px rgba(224, 195, 252, 0.6));
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+  <div id="questionBlock">
+    <h1 id="questionText">Мамо, ти мене любиш?</h1>
+    <div class="buttons" id="buttonsBlock">
+      <button id="yesBtn">Так 💜</button>
+      <button id="noBtn">Ні</button>
+    </div>
+  </div>
+
+  <div id="finalMessage">
+    <h1>А я тебе в мільйон разів сильніше! Дякую за все ❤️</h1>
+    <div class="big-heart">💜</div>
+  </div>
+
+<script>
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const questionText = document.getElementById('questionText');
+  const questionBlock = document.getElementById('questionBlock');
+  const finalMessage = document.getElementById('finalMessage');
+
+  // Фрази українською (без смайликів, як ти любиш)
+  const noTexts = [
+    "Та ну, не обманюй",
+    "Я ж знаю, що любиш",
+    "А хто мене маленьким на руках носив?",
+    "Мамо, не скромничай",
+    "Ти точно любиш, я знаю",
+    "Ну мам, ну будь ласка",
+    "А як же ті безсонні ночі?",
+    "Ти найкраща, я впевнений",
+    "Давай ще раз подумай",
+    "Серце ж не обманеш"
+  ];
+  let noCount = 0;
+
+  function teleportNo() {
+    const padding = 20;
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
+    const maxX = window.innerWidth - btnW - padding;
+    const maxY = window.innerHeight - btnH - padding;
+
+    const randX = padding + Math.random() * Math.max(0, maxX - padding);
+    const randY = padding + Math.random() * Math.max(0, maxY - padding);
+
+    noBtn.style.position = 'fixed';
+    noBtn.style.left = randX + 'px';
+    noBtn.style.top = randY + 'px';
+
+    questionText.textContent = noTexts[noCount % noTexts.length];
+    noCount++;
+  }
+
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    teleportNo();
+  }, { passive: false });
+
+  noBtn.addEventListener('mouseenter', teleportNo);
+  noBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    teleportNo();
+  });
+
+  yesBtn.addEventListener('click', () => {
+    questionBlock.style.display = 'none';
+    finalMessage.style.display = 'flex';
+    launchConfetti();
+  });
+
+  function launchConfetti() {
+    const emojis = ['❤️', '💜', '💐', '🌸', '✨', '🌷', '🌹', '🦋'];
+    for (let i = 0; i < 50; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDelay = Math.random() * 2 + 's';
+      el.style.fontSize = (20 + Math.random() * 28) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 6000);
+    }
+  }
+
+  // Фонові плаваючі елементи
+  function spawnHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    const emojis = ['❤️', '💜', '🌸', '🌷', '💐', '🦋', '✨'];
+    heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.bottom = '-40px';
+    heart.style.fontSize = (16 + Math.random() * 22) + 'px';
+    const duration = 8 + Math.random() * 8;
+    heart.style.animationDuration = duration + 's';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), duration * 1000);
+  }
+
+  setInterval(spawnHeart, 700);
+  for (let i = 0; i < 6; i++) setTimeout(spawnHeart, i * 400);
+
+  window.addEventListener('resize', () => {
+    const rect = noBtn.getBoundingClientRect();
+    if (rect.right > window.innerWidth || rect.bottom > window.innerHeight) {
+      noBtn.style.position = '';
+      noBtn.style.left = '';
+      noBtn.style.top = '';
+    }
+  });
+</script>
+</body>
+</html>
